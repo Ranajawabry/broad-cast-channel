@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="assest/css/all.min.css">
+    <link rel="stylesheet" href="assest/css/style.css">
+</head>
+<body>
+  
+      <!-- The title will change to greet the user -->
+      <h1 id="title">Hey</h1>
+      <input id="name-field" placeholder="Enter Your Name"/>
+    </body>
+    
+    <script>
+    
+    let bc = new BroadcastChannel('gator_channel');
+    
+    (()=>{
+      const title = document.getElementById('title');
+      const nameField = document.getElementById('name-field');
+      const setTitle = (userName) => {
+        title.innerHTML = 'Hey ' + userName;
+      }
+    
+      bc.onmessage = (messageEvent) => {
+        // If our broadcast message is 'update_title' then get the new title from localStorage
+        if (messageEvent.data === 'update_title') {
+          // localStorage is domain specific so when it changes in one window it changes in the other
+          setTitle(localStorage.getItem('title'));
+        }
+      }
+    
+      // When the page loads check if the title is in our localStorage
+      if (localStorage.getItem('title')) {
+        setTitle(localStorage.getItem('title'));
+      } else {
+        setTitle('please tell us your name');
+      }
+    
+      nameField.onchange = (e) => {
+        const inputValue = e.target.value;
+        // In the localStorage we set title to the user's input
+        localStorage.setItem('title', inputValue);
+        // Update the title on the current page 
+        setTitle(inputValue);
+        // Tell the other pages to update the title
+        bc.postMessage('update_title');
+      }
+    })()
+    </script>
+   
+
+
+
+    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> 
+<script src="assest/js/main.js"></script>
+</body>
+</html>
